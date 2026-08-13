@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sentiment AI</title>
+
+    <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Instrument Sans", sans-serif;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #172554 0%,
+                    #081225 40%,
+                    #030712 100%
+                );
+            color: #e5e7eb;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(
+                90deg,
+                #60a5fa,
+                #38bdf8,
+                #818cf8
+            );
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(96, 165, 250, 0.15);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(15px);
+            margin-bottom: 25px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+            border-radius: 14px;
+            border: 1px solid #1e3a5f;
+            background: #07111f;
+            color: #f8fafc;
+            padding: 18px;
+            font-size: 16px;
+            line-height: 1.6;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        textarea:focus {
+            border-color: #3b82f6;
+            box-shadow:
+                0 0 0 3px rgba(
+                    59,
+                    130,
+                    246,
+                    0.15
+                );
+        }
+
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        .button-container {
+            margin-top: 18px;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #4f46e5
+            );
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 10px 25px rgba(
+                    37,
+                    99,
+                    235,
+                    0.3
+                );
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #93c5fd;
+            margin-top: 18px;
+        }
+
+        .result {
+            display: none;
+        }
+
+        .final-result {
+            text-align: center;
+            padding: 30px;
+            border-radius: 18px;
+            background: #07111f;
+            border: 1px solid #1e3a5f;
+            margin-bottom: 25px;
+        }
+
+        .final-label {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .final-sentiment {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .method {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .models-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .model-card {
+            background: #07111f;
+            border: 1px solid #172b46;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .model-name {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .model-sentiment {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .positive {
+            color: #4ade80;
+        }
+
+        .negative {
+            color: #f87171;
+        }
+
+        .neutral {
+            color: #facc15;
+        }
+
+        .error {
+            display: none;
+            background: rgba(
+                127,
+                29,
+                29,
+                0.25
+            );
+            border: 1px solid #7f1d1d;
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #475569;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 650px) {
+
+            body {
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 38px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .model-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>Sentiment AI</h1>
+
+    </div>
+
+
+    <div class="card">
+
+        <label
+            class="label"
+            for="review"
+        >
+            Product Review
+        </label>
+
+        <textarea
+            id="review"
+            placeholder="Enter your product review here..."
+        ></textarea>
+
+        <div class="button-container">
+
+            <button
+                id="analyzeButton"
+                onclick="analyzeSentiment()"
+            >
+                Analyze Sentiment
+            </button>
+
+        </div>
+
+        <div
+            class="loading"
+            id="loading"
+        >
+            Analyzing your review...
+        </div>
+
+        <div
+            class="error"
+            id="error"
+        ></div>
+
+    </div>
+
+
+    <div
+        class="result"
+        id="result"
+    >
+
+        <div class="card">
+
+            <div class="final-result">
+
+                <div class="final-label">
+                    FINAL SENTIMENT
+                </div>
+
+                <div
+                    class="final-sentiment"
+                    id="finalSentiment"
+                >
+                    —
+                </div>
+
+                <div
+                    class="method"
+                    id="decisionMethod"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="models-title">
+                Model Predictions
+            </div>
+
+
+            <div class="model-grid">
+
+
+                <div class="model-card">
+
+                    <div class="model-name">
+                        Logistic Regression
+                    </div>
+
+                    <div
+                        class="model-sentiment"
+                        id="logistic"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="model-card">
+
+                    <div class="model-name">
+                        Naïve Bayes
+                    </div>
+
+                    <div
+                        class="model-sentiment"
+                        id="naiveBayes"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="model-card">
+
+                    <div class="model-name">
+                        Support Vector Machine
+                    </div>
+
+                    <div
+                        class="model-sentiment"
+                        id="svm"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="model-card">
+
+                    <div class="model-name">
+                        RoBERTa
+                    </div>
+
+                    <div
+                        class="model-sentiment"
+                        id="roberta"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        Sentiment AI • NLP Sentiment Classification
+    </div>
+
+</div>
+
+
+<script>
+
+async function analyzeSentiment() {
+
+    const review =
+        document.getElementById(
+            "review"
+        ).value.trim();
+
+    const button =
+        document.getElementById(
+            "analyzeButton"
+        );
+
+    const loading =
+        document.getElementById(
+            "loading"
+        );
+
+    const result =
+        document.getElementById(
+            "result"
+        );
+
+    const error =
+        document.getElementById(
+            "error"
+        );
+
+
+    error.style.display = "none";
+
+
+    if (!review) {
+
+        error.textContent =
+            "Please enter a review.";
+
+        error.style.display = "block";
+
+        return;
+    }
+
+
+    button.disabled = true;
+
+    loading.style.display = "block";
+
+    result.style.display = "none";
+
+
+    try {
+
+        const response = await fetch(
+            "/predict",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    review: review
+                })
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Something went wrong."
+            );
+
+        }
+
+
+        displaySentiment(
+            "finalSentiment",
+            data.final
+        );
+
+        displaySentiment(
+            "logistic",
+            data.logistic
+        );
+
+        displaySentiment(
+            "naiveBayes",
+            data.naive_bayes
+        );
+
+        displaySentiment(
+            "svm",
+            data.svm
+        );
+
+        displaySentiment(
+            "roberta",
+            data.roberta
+        );
+
+
+        document.getElementById(
+            "decisionMethod"
+        ).textContent =
+            data.method;
+
+
+        result.style.display =
+            "block";
+
+    }
+
+    catch (err) {
+
+        error.textContent =
+            err.message;
+
+        error.style.display =
+            "block";
+
+    }
+
+    finally {
+
+        button.disabled = false;
+
+        loading.style.display =
+            "none";
+
+    }
+
+}
+
+
+function displaySentiment(
+    elementId,
+    sentiment
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+    element.textContent =
+        sentiment;
+
+    element.className =
+        "model-sentiment";
+
+
+    if (
+        sentiment.toLowerCase()
+        === "positive"
+    ) {
+
+        element.classList.add(
+            "positive"
+        );
+
+    }
+
+    else if (
+        sentiment.toLowerCase()
+        === "negative"
+    ) {
+
+        element.classList.add(
+            "negative"
+        );
+
+    }
+
+    else {
+
+        element.classList.add(
+            "neutral"
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
