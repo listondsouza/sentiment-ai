@@ -1,8 +1,7 @@
 
-============================================================
                     SENTIMENT AI
               DOWNLOAD & SETUP GUIDE
-============================================================
+
 
 This guide shows you how to download and run Sentiment AI.
 
@@ -12,9 +11,9 @@ A = Windows Command Prompt
 B = Ubuntu Terminal
 C = Visual Studio Code
 
-============================================================
+
 A. WINDOWS COMMAND PROMPT
-============================================================
+
 
 
 STEP 1 — Install Git
@@ -278,9 +277,9 @@ The website will stop running.
 
 
 
-============================================================
+
 B. UBUNTU TERMINAL
-============================================================
+
 
 
 STEP 1 — Open Terminal
@@ -517,9 +516,9 @@ The website will stop running.
 
 
 
-============================================================
+
 C. VISUAL STUDIO CODE
-============================================================
+
 
 
 STEP 1 — Install Visual Studio Code
@@ -778,9 +777,9 @@ When finished:
 The website will stop running.
 
 
-============================================================
+
 IMPORTANT
-============================================================
+
 
 If you download the project again on another computer:
 
@@ -805,7 +804,6 @@ Do NOT delete:
 This is the large RoBERTa model required by the application.
 
 
-============================================================
 END OF GUIDE
-============================================================
+
 
